@@ -1,24 +1,15 @@
 <?php
-include_once $_SERVER['DOCUMENT_ROOT'].'/include/db_connect.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/include/notes_config.php';
 include_once $_SERVER['DOCUMENT_ROOT'].'/include/functions.php';
 sec_session_start();
+
 // Core (class)
 class Notes {
     
-    private $pdo;
+    private $mysqli;
 
-    const dbFile = 'db.sqlite';
-
-    function __construct() {
-//         $this->pdo = new PDO('sqlite:'.self::dbFile);
-//         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-//         $this->pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-//         $this->pdo->exec('CREATE TABLE IF NOT EXISTS notes (
-//         ID      INTEGER PRIMARY KEY AUTOINCREMENT,
-//         title   TEXT NOT NULL,
-//         content TEXT NOT NULL,
-//         created DATETIME NOT NULL
-//         );');
+    function __construct($mysqli = null) {
+        $this->mysqli = $mysqli;
 
         // Create new table if not exists.
         if($stmt=$mysqli->prepare('CREATE TABLE IF NOT EXISTS notes (ID INTEGER PRIMARY KEY AUTO_INCREMENT, title TEXT NOT NULL, content TEXT NOT NULL, created DATETIME NOT NULL);')){
@@ -27,26 +18,8 @@ class Notes {
     }
 
     public function fetchNotes($id = null) {
-        // if ($id != null) {
-        //     $stmt = $this->pdo->prepare('SELECT title,content FROM notes WHERE id = :ID');
-        //     $stmt->bindParam(':ID', $id);
-        //     $stmt->execute();
-        //     $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        //     foreach ($result as $row) {
-        //         $title = $row['title'];
-        //         header("Content-type: text/plain; charset=utf-8");
-        //         header("Content-Disposition: attachment; filename=$title.txt");
-        //         echo $row['content'];
-        //         return;
-        //     }
-        // } else {
-        //     $stmt = $this->pdo->query('SELECT * FROM notes ORDER BY created DESC');
-        //     $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        //     return $result;
-        // }
-        
         if ($id != null) {
-            if($stmt=$mysqli->prepare('SELECT title,content FROM notes WHERE id = ?')){
+            if($stmt=$this->mysqli->prepare('SELECT title,content FROM notes WHERE id = ?')){
                 $stmt->bind_param('i', $id);
                 $stmt->execute();
                 $result = $stmt->get_result();
@@ -59,7 +32,7 @@ class Notes {
                 }
             }
         } else {
-            if($stmt=$mysqli->prepare('SELECT * FROM notes ORDER BY created DESC')){
+            if($stmt=$this->mysqli->prepare('SELECT * FROM notes ORDER BY created DESC')){
                 $stmt->execute();
                 $result = $stmt->get_result();
                 return $result;
@@ -68,34 +41,19 @@ class Notes {
     }
 
     public function create($title, $content) {
-        // $datetime = date("Y-m-d H:i:s");
-        // $stmt = $this->pdo->prepare('INSERT INTO notes (title, content, created) VALUES (:title, :content, :created)');
-        // $stmt->bindParam(':title', $title);
-        // $stmt->bindParam(':content', $content);
-        // $stmt->bindParam(':created', $datetime);
-        // $stmt->execute();
-        
         $datetime = date("Y-m-d H:i:s");
-        if($stmt=$mysqli->prepare('INSERT INTO notes (title, content, created) VALUES (?, ?, ?)')){
+        if($stmt=$this->mysqli->prepare('INSERT INTO notes (title, content, created) VALUES (?, ?, ?)')){
             $stmt->bind_param('sss',$title, $content, $datetime);
             $stmt->execute();
         }
     }
 
     public function delete($id) {
-        // if ($id == 'all') {
-        //     $stmt = $this->pdo->query('DELETE FROM notes; VACUUM');
-        // } else {
-        //     $stmt = $this->pdo->prepare('DELETE FROM notes WHERE id = :ID');
-        //     $stmt->bindParam(':ID', $id);
-        //     $stmt->execute();
-        // }
-        
         if ($id == 'all') {
-            $stmt = $mysqli->query('DROP table notepad FROM notes; VACUUM');
+            $stmt = $this->mysqli->query('DROP table notepad FROM notes; VACUUM');
              __construct();
         } else {
-            if($stmt=$mysqli->prepare('DELETE FROM notes WHERE id = ?')){
+            if($stmt=$this->mysqli->prepare('DELETE FROM notes WHERE id = ?')){
                 $stmt->bind_param('i', $id);
                 $stmt->execute();
             }
@@ -103,13 +61,7 @@ class Notes {
     }
 
     public function edit($id, $title, $content) {
-        // $stmt = $this->pdo->prepare('UPDATE notes SET title = :title, content = :content WHERE id = :ID');
-        // $stmt->bindParam(':ID', $id);
-        // $stmt->bindParam(':title', $title);
-        // $stmt->bindParam(':content', $content);
-        // $stmt->execute();
-        
-        if($stmt=$mysqli->prepare('UPDATE notes SET title = ?, content = ? WHERE id = ?')){
+        if($stmt=$this->mysqli->prepare('UPDATE notes SET title = ?, content = ? WHERE id = ?')){
             $stmt->bind_param('ssi',$title, $content, $id);
             $stmt->execute();
         }
@@ -117,7 +69,7 @@ class Notes {
 }
 
 // Init core (class)
-$notes = new Notes;
+$notes = new Notes($mysqli_notes);
 
 // Actions
 if (isset($_POST['new'])) {
