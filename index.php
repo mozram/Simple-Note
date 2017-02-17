@@ -1,6 +1,6 @@
 <?php
-include_once $_SERVER['DOCUMENTS_ROOT'].'/include/db_connect.php';
-include_once $_SERVER['DOCUMENTS_ROOT'].'/include/functions.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/include/db_connect.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/include/functions.php';
 sec_session_start();
 // Core (class)
 class Notes {
