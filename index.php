@@ -1,5 +1,7 @@
 <?php
-
+include_once $_SERVER['DOCUMENTS_ROOT'].'/include/db_connect.php';
+include_once $_SERVER['DOCUMENTS_ROOT'].'/include/functions.php';
+sec_session_start();
 // Core (class)
 class Notes {
     
@@ -8,15 +10,18 @@ class Notes {
     const dbFile = 'db.sqlite';
 
     function __construct() {
-        $this->pdo = new PDO('sqlite:'.self::dbFile);
-        $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $this->pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-        $this->pdo->exec('CREATE TABLE IF NOT EXISTS notes (
-        ID      INTEGER PRIMARY KEY AUTOINCREMENT,
-        title   TEXT NOT NULL,
-        content TEXT NOT NULL,
-        created DATETIME NOT NULL
-        );');
+//         $this->pdo = new PDO('sqlite:'.self::dbFile);
+//         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+//         $this->pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+//         $this->pdo->exec('CREATE TABLE IF NOT EXISTS notes (
+//         ID      INTEGER PRIMARY KEY AUTOINCREMENT,
+//         title   TEXT NOT NULL,
+//         content TEXT NOT NULL,
+//         created DATETIME NOT NULL
+//         );');
+        if($stmt=$mysqli->prepare('CREATE TABLE IF NOT EXISTS notes (ID INTEGER PRIMARY KEY AUTO_INCREMENT, title TEXT NOT NULL, content TEXT NOT NULL, created DATETIME NOT NULL);')){
+            $stmt->execute();
+        }
     }
 
     public function fetchNotes($id = null) {
