@@ -113,7 +113,7 @@ if (!empty($_GET['dl'])) {
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title> Simple Note - <?php echo $_SESSION['username']?></title>
+    <title> Simple Note - <?php echo $_SESSION['username'];?></title>
 
     <link rel="stylesheet" href="//bootswatch.com/flatly/bootstrap.css">
 
