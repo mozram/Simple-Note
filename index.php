@@ -2,24 +2,32 @@
 include_once $_SERVER['DOCUMENT_ROOT'].'/include/notes_config.php';
 include_once $_SERVER['DOCUMENT_ROOT'].'/include/functions.php';
 sec_session_start();
+if(token_check($mysqli) != true){
+    if(login_check($mysqli) != true) {
+        header('Location: ../login?error=2');
+        exit();
+    }
+}
 
 // Core (class)
 class Notes {
     
     private $mysqli;
+    private $username;
 
-    function __construct($mysqli = null) {
+    function __construct($mysqli = null, $username = null) {
         $this->mysqli = $mysqli;
+        $this->username = $username;
 
         // Create new table if not exists.
-        if($stmt=$mysqli->prepare('CREATE TABLE IF NOT EXISTS notes (ID INTEGER PRIMARY KEY AUTO_INCREMENT, title TEXT NOT NULL, content TEXT NOT NULL, created DATETIME NOT NULL);')){
+        if($stmt=$mysqli->prepare('CREATE TABLE IF NOT EXISTS $username (ID INTEGER PRIMARY KEY AUTO_INCREMENT, title TEXT NOT NULL, content TEXT NOT NULL, created DATETIME NOT NULL);')){
             $stmt->execute();
         }
     }
 
     public function fetchNotes($id = null) {
         if ($id != null) {
-            if($stmt=$this->mysqli->prepare('SELECT title,content FROM notes WHERE id = ?')){
+            if($stmt=$this->mysqli->prepare('SELECT title,content FROM $username WHERE id = ?')){
                 $stmt->bind_param('i', $id);
                 $stmt->execute();
                 $result = $stmt->get_result();
@@ -32,7 +40,7 @@ class Notes {
                 }
             }
         } else {
-            if($stmt=$this->mysqli->prepare('SELECT * FROM notes ORDER BY created DESC')){
+            if($stmt=$this->mysqli->prepare('SELECT * FROM $username ORDER BY created DESC')){
                 $stmt->execute();
                 $result = $stmt->get_result();
                 return $result;
@@ -42,7 +50,7 @@ class Notes {
 
     public function create($title, $content) {
         $datetime = date("Y-m-d H:i:s");
-        if($stmt=$this->mysqli->prepare('INSERT INTO notes (title, content, created) VALUES (?, ?, ?)')){
+        if($stmt=$this->mysqli->prepare('INSERT INTO $username (title, content, created) VALUES (?, ?, ?)')){
             $stmt->bind_param('sss',$title, $content, $datetime);
             $stmt->execute();
         }
@@ -50,10 +58,10 @@ class Notes {
 
     public function delete($id) {
         if ($id == 'all') {
-            $stmt = $this->mysqli->query('DROP table notepad FROM notes; VACUUM');
+            $stmt = $this->mysqli->query('DROP table $username FROM notes; VACUUM');
              __construct();
         } else {
-            if($stmt=$this->mysqli->prepare('DELETE FROM notes WHERE id = ?')){
+            if($stmt=$this->mysqli->prepare('DELETE FROM $username WHERE id = ?')){
                 $stmt->bind_param('i', $id);
                 $stmt->execute();
             }
@@ -61,7 +69,7 @@ class Notes {
     }
 
     public function edit($id, $title, $content) {
-        if($stmt=$this->mysqli->prepare('UPDATE notes SET title = ?, content = ? WHERE id = ?')){
+        if($stmt=$this->mysqli->prepare('UPDATE $username SET title = ?, content = ? WHERE id = ?')){
             $stmt->bind_param('ssi',$title, $content, $id);
             $stmt->execute();
         }
@@ -69,7 +77,7 @@ class Notes {
 }
 
 // Init core (class)
-$notes = new Notes($mysqli_notes);
+$notes = new Notes($mysqli_notes, $_SESSION['username'];
 
 // Actions
 if (isset($_POST['new'])) {
@@ -105,7 +113,7 @@ if (!empty($_GET['dl'])) {
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title> Simple Note </title>
+    <title> Simple Note - <?php echo $_SESSION['username']?></title>
 
     <link rel="stylesheet" href="//bootswatch.com/flatly/bootstrap.css">
 
