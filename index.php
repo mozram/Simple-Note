@@ -77,7 +77,7 @@ class Notes {
 }
 
 // Init core (class)
-$notes = new Notes($mysqli_notes, $_SESSION['username'];
+$notes = new Notes($mysqli_notes, $_SESSION['username']);
 
 // Actions
 if (isset($_POST['new'])) {
