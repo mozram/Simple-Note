@@ -20,14 +20,14 @@ class Notes {
         $this->username = $username;
 
         // Create new table if not exists.
-        if($stmt=$mysqli->prepare('CREATE TABLE IF NOT EXISTS $username (ID INTEGER PRIMARY KEY AUTO_INCREMENT, title TEXT NOT NULL, content TEXT NOT NULL, created DATETIME NOT NULL);')){
+        if($stmt=$mysqli->prepare('CREATE TABLE IF NOT EXISTS $this->username (ID INTEGER PRIMARY KEY AUTO_INCREMENT, title TEXT NOT NULL, content TEXT NOT NULL, created DATETIME NOT NULL);')){
             $stmt->execute();
         }
     }
 
     public function fetchNotes($id = null) {
         if ($id != null) {
-            if($stmt=$this->mysqli->prepare('SELECT title,content FROM $username WHERE id = ?')){
+            if($stmt=$this->mysqli->prepare('SELECT title,content FROM $this->username WHERE id = ?')){
                 $stmt->bind_param('i', $id);
                 $stmt->execute();
                 $result = $stmt->get_result();
@@ -40,7 +40,7 @@ class Notes {
                 }
             }
         } else {
-            if($stmt=$this->mysqli->prepare('SELECT * FROM $username ORDER BY created DESC')){
+            if($stmt=$this->mysqli->prepare('SELECT * FROM $this->username ORDER BY created DESC')){
                 $stmt->execute();
                 $result = $stmt->get_result();
                 return $result;
@@ -50,7 +50,7 @@ class Notes {
 
     public function create($title, $content) {
         $datetime = date("Y-m-d H:i:s");
-        if($stmt=$this->mysqli->prepare('INSERT INTO $username (title, content, created) VALUES (?, ?, ?)')){
+        if($stmt=$this->mysqli->prepare('INSERT INTO $this->username (title, content, created) VALUES (?, ?, ?)')){
             $stmt->bind_param('sss',$title, $content, $datetime);
             $stmt->execute();
         }
@@ -58,10 +58,10 @@ class Notes {
 
     public function delete($id) {
         if ($id == 'all') {
-            $stmt = $this->mysqli->query('DROP table $username FROM notes; VACUUM');
+            $stmt = $this->mysqli->query('DROP table $this->username FROM notes; VACUUM');
              __construct();
         } else {
-            if($stmt=$this->mysqli->prepare('DELETE FROM $username WHERE id = ?')){
+            if($stmt=$this->mysqli->prepare('DELETE FROM $this->username WHERE id = ?')){
                 $stmt->bind_param('i', $id);
                 $stmt->execute();
             }
@@ -69,7 +69,7 @@ class Notes {
     }
 
     public function edit($id, $title, $content) {
-        if($stmt=$this->mysqli->prepare('UPDATE $username SET title = ?, content = ? WHERE id = ?')){
+        if($stmt=$this->mysqli->prepare('UPDATE $this->username SET title = ?, content = ? WHERE id = ?')){
             $stmt->bind_param('ssi',$title, $content, $id);
             $stmt->execute();
         }
