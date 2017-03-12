@@ -121,6 +121,8 @@ if (!empty($_GET['dl'])) {
 
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 
+    <script src="notes.js"></script>
+
     <style>
         .container {
             max-width: 680px;
@@ -141,7 +143,7 @@ if (!empty($_GET['dl'])) {
             <h2> Send a new note </h2>
         </div>
 
-        <form role="form" action="index.php" method="POST">
+        <form role="form" action="index" method="POST">
             <div class="form-group">
                 <input class="form-control" type="text" placeholder="Title" name="title" required>
             </div>
@@ -186,7 +188,7 @@ if (!empty($_GET['dl'])) {
                             <td class="pull-right">
                                 <div class="btn-group">
                                     <a class="btn btn-default btn-xs" title="Edit this note" href="#" data-toggle="modal" data-target="#<?= $row['ID'] ?>"><span class="glyphicon glyphicon-edit"></span></a>
-                                    <a class="btn btn-danger btn-xs" title="Delete this note" href="?del=<?= $row['ID'] ?>"><span class="glyphicon glyphicon-trash"></span></a>
+                                    <a class="btn btn-danger btn-xs" title="Delete this note" onclick="confirm_Delete(<?= $row['ID'] ?>)" ><span class="glyphicon glyphicon-trash"></span></a>
                                     <a class="btn btn-info btn-xs" title="Download this note" href="?dl=<?= $row['ID'] ?>" target="_blank"><span class="glyphicon glyphicon-download-alt"></span></a>
                                 </div>
                             </td>
